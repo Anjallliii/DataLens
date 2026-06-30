@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>DataLens</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <div class="header">
+        <div>
+            <h1>🔍 DataLens</h1>
+            <div class="tagline">AI-powered chart analysis & misleading detection</div>
+        </div>
+    </div>
+
+    <button id="analyzeBtn">⚡ Analyze Page</button>
+    <button id="selectAreaBtn">✂️ Select Area</button>
+
+    <div id="status">Ready to analyze...</div>
+
+    <div id="results" style="display:none;">
+
+        <div id="chartType"></div>
+        <div id="explanation"></div>
+        <div id="insight"></div>
+
+        <div class="divider"></div>
+
+        <div id="misleadingSection" style="display:none;">
+            <div id="misleadingScore"></div>
+            <div id="misleadingIssues"></div>
+            <div id="trustScore"></div>
+        </div>
+
+        <div id="vegaContainer" style="display:none;">
+            <div class="section-title">✅ Corrected Chart</div>
+            <canvas id="correctedChart"></canvas>
+            <div id="fixesList"></div>
+        </div>
+
+        <!-- Chat Section -->
+<div id="chatSection" style="display:none; margin-top:12px;">
+    <div class="section-title">💬 Chat with Chart</div>
+    <div id="chatMessages"></div>
+    <div class="chat-input-row">
+        <input
+            type="text"
+            id="chatInput"
+            placeholder="Ask about this chart..."
+            maxlength="200"
+        />
+        <button id="chatSendBtn">Send</button>
+    </div>
+    <div class="chat-suggestions">
+        <span class="suggestion" data-q="What is the main trend?">Main trend?</span>
+        <span class="suggestion" data-q="Why is this misleading?">Why misleading?</span>
+        <span class="suggestion" data-q="Explain to a 10 year old">Simplify</span>
+        <span class="suggestion" data-q="What is the highest value?">Highest value?</span>
+    </div>
+</div>
+
+    </div>
+
+    <script src="chart.umd.min.js"></script>
+    <script src="popup.js"></script>
+
+</body>
+</html>

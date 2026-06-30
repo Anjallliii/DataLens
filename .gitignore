@@ -1,0 +1,18 @@
+# Environment files
+.env
+*.env
+datalens-backend/.env
+
+# Python
+venv/
+datalens-backend/venv/
+__pycache__/
+*/__pycache__/
+*.pyc
+
+# OS
+.DS_Store
+Thumbs.db
+
+# VS Code
+.vscode/
