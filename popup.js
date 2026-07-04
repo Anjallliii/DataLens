@@ -85,15 +85,25 @@ async function analyzeBase64Image(imageBase64) {
             issuesDiv.innerHTML = "";
 
             m.issues.forEach(issue => {
-                const card = document.createElement("div");
-                card.className = `issue-card ${issue.severity}`;
-                card.innerHTML = `
-                    <div class="issue-type">${issue.type.replace(/_/g, " ")}</div>
-                    <div class="issue-description">${issue.description}</div>
-                    <div class="issue-fix">💡 Fix: ${issue.fix}</div>
-                `;
-                issuesDiv.appendChild(card);
-            });
+    const card = document.createElement("div");
+    card.className = `issue-card ${issue.severity}`;
+
+    // Icon based on severity
+    const icon = issue.severity === "high" ? "🔴" :
+                 issue.severity === "medium" ? "🟡" : "🟢";
+
+    // Format type nicely
+    const typeName = issue.type
+        .replace(/_/g, " ")
+        .toUpperCase();
+
+    card.innerHTML = `
+        <div class="issue-type">${icon} ${typeName}</div>
+        <div class="issue-description">${issue.description}</div>
+        <div class="issue-fix">💡 Fix: ${issue.fix}</div>
+    `;
+    issuesDiv.appendChild(card);
+});
 
             document.getElementById("trustScore").textContent =
                 `Trust Score: ${Math.round(m.trust_score * 100)}% — ${m.overall_verdict}`;

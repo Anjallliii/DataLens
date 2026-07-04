@@ -29,7 +29,7 @@ print("GROQ KEY FOUND:", GROQ_API_KEY is not None)
 client = Groq(api_key=GROQ_API_KEY)
 
 FULL_ANALYSIS_PROMPT = """
-You are an expert data visualization analyst.
+You are an expert data visualization analyst specializing in detecting misleading charts.
 Analyze this chart image and respond ONLY in this exact JSON format:
 
 {
@@ -40,12 +40,14 @@ Analyze this chart image and respond ONLY in this exact JSON format:
   "explanation": "2-3 sentence plain English explanation of what this chart shows",
   "insight": "the single most important takeaway from this chart",
   "confidence": 0.95,
+
   "ocr": {
     "all_text": ["every piece of text visible in the chart"],
     "x_axis_values": ["value1", "value2"],
     "y_axis_values": ["value1", "value2"],
     "legend_items": ["item1", "item2"]
   },
+
   "misleading": {
     "misleading_score": 3,
     "trust_score": 0.7,
@@ -59,6 +61,7 @@ Analyze this chart image and respond ONLY in this exact JSON format:
       }
     ]
   },
+
   "vegaLite": {
     "$schema": "https://vega.github.io/schema/vega-lite/v5.json",
     "title": "Corrected Chart Title",
@@ -75,8 +78,33 @@ Analyze this chart image and respond ONLY in this exact JSON format:
       "y": {"field": "value", "type": "quantitative", "title": "Value", "scale": {"zero": true}}
     }
   },
+
   "fixes_applied": ["list of fixes applied in the corrected Vega-Lite chart"]
 }
+
+IMPORTANT - Check for ALL 21 misleading issues from this checklist:
+
+1. TRUNCATED_AXIS: Y-axis does not start at zero, exaggerating differences
+2. THREE_D_CHART: Chart uses 3D effects that distort perception of values
+3. MISSING_TITLE: Chart has no title, making context unclear
+4. DUAL_AXIS: Chart uses two different Y-axes that could mislead comparison
+5. MISREPRESENTATION: Visual representation is not proportional to data values
+6. MISSING_AXIS_TITLE: X or Y axis has no label/title
+7. MISSING_LEGEND: Chart has multiple data series but no legend
+8. INCONSISTENT_TICK_INTERVALS: Axis tick marks are not evenly spaced
+9. NOT_DATA: Chart appears to be fictional, satirical or parody data
+10. SELECTIVE_DATA: Data appears cherry-picked or shows only partial time range
+11. DUBIOUS_DATA: Data source is missing, unclear or questionable
+12. MISSING_VALUE_LABELS: Important values or data points are not labeled
+13. AREA_ENCODING: Area used to represent data but perception is distorted
+14. OVERUSING_COLORS: Too many colors used making chart hard to read
+15. INAPPROPRIATE_AXIS_RANGE: Axis range compresses or stretches visual impact
+16. INDISTINGUISHABLE_COLORS: Colors used are too similar to differentiate
+17. INEFFECTIVE_COLOR_SCHEME: Color scheme does not aid comprehension
+18. DISCRETIZED_CONTINUOUS: Continuous data wrongly shown as discrete categories
+19. MISSING_NORMALIZATION: Raw counts used when percentage would be more appropriate
+20. MISSING_AXIS: Chart is missing an axis entirely
+21. INCONSISTENT_BINNING: Bins or groups have inconsistent sizes
 
 Rules:
 - Return ONLY the JSON object
@@ -84,13 +112,13 @@ Rules:
 - No text before or after JSON
 - chart_type: bar, line, pie, scatter, heatmap, candlestick, histogram, area, map, unknown
 - misleading_score: 0 (clean) to 10 (very misleading)
-- trust_score: 0.0 to 1.0
-- Do not hallucinate chart values.
-- If chart data is unreadable, do NOT invent or estimate values.
-- If exact chart values cannot be read clearly, set "vegaLite": null.
-- If "vegaLite" is null, still provide explanation, insight, confidence, OCR text, and misleading analysis based only on visible information.
-- Never generate placeholder values like Item 1, Item 2, Item 3 unless they are actually visible in the chart.
-- If the chart is not clear enough, say that the chart is partially readable.
+- trust_score: 0.0 (untrustworthy) to 1.0 (fully trustworthy)
+- severity: "high", "medium", or "low"
+- issues: empty array [] if no issues found
+- type field must use EXACT names from checklist above (e.g. "truncated_axis", "three_d_chart")
+- vegaLite: generate realistic corrected data based on what you can see
+- If chart data is unreadable, use approximate estimated values
+- Check ALL 21 issues, not just the obvious ones
 """
 
 def fetch_image(url):
